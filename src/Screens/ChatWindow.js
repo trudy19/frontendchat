@@ -93,13 +93,21 @@ console.log("instialize")
     };
 
 
-    const onMessageReceived = (msg) => {
+    const  onMessageReceived = async (msg) => {
         console.log("i received a smg"+msg)
+        console.log(activeChat.userId)
+let toverifyactive=activeChat;
+let toverifystate=state;
         let message = JSON.parse(msg.body);
         message.time = new Date(message.time).toString();
-        if (message.sender === userInfo.userId) {
+        if (message.sender === userInfo.username) {
             message.mine = true;
         } else {
+            console.log(activeChat)
+            console.log(activeChat.userId)
+            console.log(message.content)
+         let decrytedMessage = await state.signalProtocolManagerUser.decryptMessageAsync("y", message.content)
+
             message.mine = false;
         }
         setReceivedMessages((messages) => [...messages, message]);
@@ -109,10 +117,14 @@ console.log("instialize")
         console.log(Conversations.data)}
     }, [Conversations]);*/
 
+
     useEffect(() => {
         setLoggedinUser();
+
+    },[]);
+    useEffect(() => {
         console.log("effect de connect")
-        if(conversations){
+        if(conversations&&state.signalProtocolManagerUser!=null){
 
         if (conversations.data === undefined || conversations.data.length === 0) {
             console.log("step0")
@@ -137,7 +149,7 @@ console.log("instialize")
                 subscribeChatrooms();
             }
         }
-    }}, []);
+    }}, [state]);
 
 
     const setLoggedinUser=()=> {
@@ -154,6 +166,8 @@ console.log("instialize")
         setChatText("");
         let msg = chatText;
         try {
+            console.log(activeChat.userId)
+            let toverifyybeforesending =activeChat.userId;
             let encryptedMessage = await state.signalProtocolManagerUser.encryptMessageAsync(activeChat.userId,msg);
             //let encryptedMessage = await encryptMessageAsync(activeChat.userId,msg);
             msg= encryptedMessage
@@ -164,7 +178,7 @@ console.log("instialize")
         }
         if (msg!== "") {
             let chatconversationId = activeChat.chatconversationId;
-            let friendName = activeChat.name;
+            let friendName = activeChat.userId;
             const message = {
                 sender: userInfo.username,
                 receiver: friendName,

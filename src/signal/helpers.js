@@ -28,11 +28,11 @@ const util = (function () {
 
             var str;
             if (typeof thing == "string") {
-                str = "thing";
+                str =thing;
             } else {
                 throw new Error("Tried to convert a non-string of type " + typeof thing + " to an array buffer");
             }
-            let tobereturn =new dcodeIO.ByteBuffer.wrap("thing", 'binary').toArrayBuffer();
+            let tobereturn =new dcodeIO.ByteBuffer.wrap(str, 'binary').toArrayBuffer();
             return tobereturn;
         },
         isEqual: function (a, b) {

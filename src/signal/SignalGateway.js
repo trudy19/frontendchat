@@ -174,6 +174,9 @@ console.log(remoteUserId)
        // let tobeencrypted=util.toArrayBuffer(message) ;
         
         let cipherText = await sessionCipher.encrypt(util.toArrayBuffer(message));
+        
+        console.log(typeof cipherText);
+        console.log(typeof cipherText.body);
         return cipherText
     }
 
@@ -185,24 +188,29 @@ console.log(remoteUserId)
      * @returns The decrypted message string.
      */
     async decryptMessageAsync(remoteUserId, cipherText) {
-        var sessionCipher = this.store.loadSessionCipher(remoteUserId);
-
+        var sessionCipher = await this.store.loadSessionCipher(remoteUserId);
+        console.log(typeof cipherText);
         if (sessionCipher == null) {
             var address = new libsignal.SignalProtocolAddress(remoteUserId, 123);
             var sessionCipher = new libsignal.SessionCipher(this.store, address);
             this.store.storeSessionCipher(remoteUserId, sessionCipher);
         }
-
-        var messageHasEmbeddedPreKeyBundle = cipherText.type == 3;
+        //cipher.type==3;
+        var messageHasEmbeddedPreKeyBundle =cipherText.type == 3;
         // Decrypt a PreKeyWhisperMessage by first establishing a new session.
         // Returns a promise that resolves when the message is decrypted or
         // rejects if the identityKey differs from a previously seen identity for this address.
         if (messageHasEmbeddedPreKeyBundle) {
             var decryptedMessage = await sessionCipher.decryptPreKeyWhisperMessage(cipherText.body, 'binary');
+           console.log(typeof decryptedMessage)
+           
+            let toverifydecryption=util.toString(decryptedMessage);
+
             return util.toString(decryptedMessage);
         } else {
             // Decrypt a normal message using an existing session
             var decryptedMessage = await sessionCipher.decryptWhisperMessage(cipherText.body, 'binary');
+           let toverifydecryption=util.toString(decryptedMessage);
             return util.toString(decryptedMessage);
         }
     }
